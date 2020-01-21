@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cas.UserMapper">
+
+
+
+    <select id="findUserName" parameterType="java.util.Map" resultType="java.lang.String">
+        select id_ from t_user where username_=#{username} and password_ =#{passowrd}
+    </select>
+
+</mapper>

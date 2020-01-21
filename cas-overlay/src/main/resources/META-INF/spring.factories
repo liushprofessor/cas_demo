@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.cas.DataSourceConfig,\
+com.cas.Config,com.cas.CASWebFlowConfig
