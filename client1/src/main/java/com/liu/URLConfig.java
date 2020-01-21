@@ -8,7 +8,7 @@ public class URLConfig {
     /**
      * 当前应用程序的baseUrl（注意最后面的斜线）
      */
-    public static String SERVER_NAME = "http://localhost:8181/";
+    public static String SERVER_NAME = "http://192.168.171.45:8181/";
 
 
     /**
@@ -20,18 +20,18 @@ public class URLConfig {
     /**
      * CAS服务器地址
      */
-    public static String CAS_SERVER_PATH = "http://localhost:8080/cas";
+    public static String CAS_SERVER_PATH = "http://192.168.171.44:8089/cas";
 
 
     /**
      * CAS登陆服务器地址
      */
-    public static String CAS_SERVER_LOGIN_PATH = "http://localhost:8080/cas/login";
+    public static String CAS_SERVER_LOGIN_PATH = "http://192.168.171.44:8089/cas/login";
 
     /**
      * CAS登出服务器地址
      */
-    public static String CAS_SERVER_LOGOUT_PATH = "http://localhost:8080/cas/logout";
+    public static String CAS_SERVER_LOGOUT_PATH = "http://192.168.171.44:8089/cas/logout";
 
 
 }

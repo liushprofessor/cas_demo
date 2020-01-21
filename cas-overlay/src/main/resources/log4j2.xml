@@ -2,7 +2,7 @@
 <!-- Specify the refresh internal in seconds. -->
 <Configuration monitorInterval="5" packages="org.apereo.cas.logging">
     <Properties>
-        <Property name="baseDir">/etc/cas/logs</Property>
+        <Property name="baseDir">/home/syd/sso/log</Property>
     </Properties>
     <Appenders>
         <Console name="console" target="SYSTEM_OUT">

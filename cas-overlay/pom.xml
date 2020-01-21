@@ -160,6 +160,9 @@
                                 <exclude>WEB-INF/classes/services/*</exclude>
                                 <exclude>WEB-INF/classes/application.*</exclude>
                                 <exclude>WEB-INF/classes/log4j2.*</exclude>
+                                <exclude>WEB-INF/classes/webflow/login/*.xml</exclude>
+                                <exclude>WEB-INF/classes/templates/fragments/loginform.html</exclude>
+
                             </excludes>
                         </overlay>
                     </overlays>
