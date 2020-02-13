@@ -157,6 +157,7 @@
 
                     <script type="text/javascript" th:inline="javascript">
                         var i = [[#{screen.welcome.button.loginwip}]]
+                        alert(i)
                         $( document ).ready(function() {
                             $("#fm1").submit(function () {
                                 $(":submit").attr("disabled", true);

@@ -2,11 +2,16 @@
 package com.cas;
 
 
+import org.apache.http.client.RedirectStrategy;
 import org.apereo.cas.authentication.AuthenticationEventExecutionPlan;
 import org.apereo.cas.authentication.AuthenticationEventExecutionPlanConfigurer;
 import org.apereo.cas.authentication.AuthenticationHandler;
 import org.apereo.cas.authentication.principal.DefaultPrincipalFactory;
 import org.apereo.cas.services.ServicesManager;
+import org.apereo.cas.web.flow.GenerateServiceTicketAction;
+import org.apereo.cas.web.flow.actions.AuthenticationExceptionHandlerAction;
+import org.apereo.cas.web.flow.actions.InitialAuthenticationAction;
+import org.apereo.cas.web.flow.login.GenericSuccessViewAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +42,10 @@ public class Config implements AuthenticationEventExecutionPlanConfigurer {
     @Bean
     @DependsOn({"dataSource","mapperScannerConfigurer","sqlSessionFactory"})
     public AuthenticationHandler authenticationHandler(){
-
+        //AuthenticationExceptionHandlerAction
+        //RedirectStrategy
+        //GenericSuccessViewAction
+        //GenerateServiceTicketAction
         return new CustomUsernamePasswordAuthentication(CustomUsernamePasswordAuthentication.class.getName(), servicesManager, new DefaultPrincipalFactory(), 1,userMapper);
     }
 

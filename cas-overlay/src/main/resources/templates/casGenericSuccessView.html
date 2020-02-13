@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <!--<title th:text="#{screen.success.header}">Generic Success View</title>-->
+    <!--<link href="../../static/css/cas.css" rel="stylesheet" th:remove="tag" />-->
+</head>
+
+<body>
+<!--此页面是登录完成如果url中没有带service参数的话进入到此页面-->
+</body>
+<script>
+    $(function () {
+        var type = getQueryString("type");
+        if (type == 2) {
+            location.href = "https://www.baidu.com";
+        } else if (type == 1) {
+            location.href = "https://www.qq.com";
+        } else {
+            alert("不存在type参数无法跳转")
+        }
+
+    });
+
+
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r != null) return decodeURI(r[2]);
+        return null;
+    }
+
+
+</script>
+
+
+</html>

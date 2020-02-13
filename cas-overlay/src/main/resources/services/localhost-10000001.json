@@ -5,6 +5,7 @@
   "id" : 10000001,
   "description" : "This service definition authorizes all application urls that support HTTPS and HTTP and IMAPS protocols.",
   "evaluationOrder" : 10000,
+  "theme":"theme_default",
   "proxyPolicy": {
     "@class": "org.apereo.cas.services.RegexMatchingRegisteredServiceProxyPolicy",
     "pattern": "^(https|http)?://.*"

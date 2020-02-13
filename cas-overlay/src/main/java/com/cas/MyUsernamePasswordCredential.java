@@ -15,9 +15,10 @@ import org.apereo.cas.authentication.UsernamePasswordCredential;
 public class MyUsernamePasswordCredential extends UsernamePasswordCredential {
 
 
-    public MyUsernamePasswordCredential(String username, String password, String code) {
+    public MyUsernamePasswordCredential(String username, String password, String code,int type) {
         super(username, password);
         this.code = code;
+        this.type=type;
     }
 
     //必须添加空参构造，不然Web Flow无法注入
@@ -27,6 +28,15 @@ public class MyUsernamePasswordCredential extends UsernamePasswordCredential {
 
     private String code;
 
+    private int type;
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
 
     public String getCode() {
         return code;
