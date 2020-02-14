@@ -1,5 +1,5 @@
 /**
- * Created on [2020/2/11 9:27] by Administrator
+ * Created on [2020/2/14 10:14] by Administrator
  * <p>
  * 项目名称： cas TODO(项目名称)
  * <p>
@@ -10,12 +10,18 @@
  * <p>
  * ©2020 福建慧政通信息科技有限公司
  */
-package com.sunnada;
+package com.liu;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 功能： TODO(用一句话描述类的功能)
@@ -23,40 +29,22 @@ import org.springframework.web.bind.annotation.RestController;
  * ──────────────────────────────────────────
  *   version  变更日期    修改人    修改说明
  * ------------------------------------------
- *   V1.0.0   2020/2/11    Liush     初版
+ *   V1.0.0   2020/2/14    Liush     初版
  * ──────────────────────────────────────────
  */
-@org.springframework.stereotype.Controller
-public class Controller {
+@Controller
+@AutoConfigureAfter(ClientProperties.class )
+public class LogoutController {
 
+    @Autowired
+    private ClientProperties clientProperties;
 
-    @RequestMapping("test")
-    @ResponseBody
-    public String test(){
-
-
-        return "client3 test success";
+    @RequestMapping("logout")
+    public String logout(HttpServletRequest request){
+        ModelAndView modelAndView=new ModelAndView(clientProperties.casServiceUrl+clientProperties.casContextPath+clientProperties.logoutUrl+"?service="+clientProperties.serviceUrl+"/logout.html");
+        request.getSession().invalidate();
+       return "redirect:"+clientProperties.casServiceUrl+clientProperties.casContextPath+clientProperties.logoutUrl+"?service="+clientProperties.serviceUrl+clientProperties.clientContextPath+"/logout.html";
     }
-
-
-    @RequestMapping("/welcome1")
-    public String toWelcome1(Model model){
-
-        model.addAttribute("message","欢迎来到页面1");
-        return "welcome1";
-    }
-
-    @RequestMapping("/welcome2")
-    public String toWelcome2(Model model){
-
-        model.addAttribute("message","欢迎来到页面2");
-        return "welcome1";
-    }
-
-
-
-
-
 
 
 

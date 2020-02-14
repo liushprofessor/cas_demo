@@ -15,10 +15,12 @@
 <script>
     $(function () {
         var type = getQueryString("type");
-        if (type == 2) {
-            location.href = "https://www.baidu.com";
-        } else if (type == 1) {
-            location.href = "https://www.qq.com";
+        if (type == 1) {
+            //这里做了nginx反向代理，换成实际的回调url
+            location.href = "http://localhost/client3/welcome1";
+        } else if (type == 2) {
+            //这里做了nginx反向代理，换成实际的回调url
+            location.href = "http://localhost/client3/welcome2";
         } else {
             alert("不存在type参数无法跳转")
         }

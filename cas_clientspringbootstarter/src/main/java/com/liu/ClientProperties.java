@@ -35,7 +35,10 @@ public class ClientProperties {
     public String serviceUrl;
 
     //CAS 服务路径
-    public String contextPath="/cas";
+    public String casContextPath="/cas";
+
+    //应用部署路径
+    public String clientContextPath;
 
     //CAS登录地址
     public String loginUrl="/login";

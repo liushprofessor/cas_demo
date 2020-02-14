@@ -52,7 +52,7 @@ public class CASConfig {
         // 设定匹配的路径
         registration.addUrlPatterns("/*");
         Map<String, String> initParameters = new HashMap();
-        initParameters.put("casServerUrlPrefix", clientProperties.casServiceUrl+clientProperties.contextPath+clientProperties.loginUrl);
+        initParameters.put("casServerUrlPrefix", clientProperties.casServiceUrl+clientProperties.casContextPath+clientProperties.loginUrl);
         registration.setInitParameters(initParameters);
         // 设定加载的顺序
         registration.setOrder(1);
@@ -87,7 +87,7 @@ public class CASConfig {
         // 设定匹配的路径
         registration.addUrlPatterns("/*");
         Map<String, String> initParameters = new HashMap();
-        initParameters.put("casServerUrlPrefix", clientProperties.casServiceUrl+clientProperties.contextPath);
+        initParameters.put("casServerUrlPrefix", clientProperties.casServiceUrl+clientProperties.casContextPath);
         initParameters.put("serverName", clientProperties.serviceUrl);
 
         // 是否对serviceUrl进行编码，默认true：设置false可以在302对URL跳转时取消显示;jsessionid=xxx的字符串
@@ -113,7 +113,7 @@ public class CASConfig {
 
         registration.setFilter(new AuthenticationFilter());
         registration.addUrlPatterns("/*");
-        initParameters.put("casServerLoginUrl", clientProperties.casServiceUrl+clientProperties.contextPath+clientProperties.loginUrl);
+        initParameters.put("casServerLoginUrl", clientProperties.casServiceUrl+clientProperties.casContextPath+clientProperties.loginUrl);
         initParameters.put("serverName", clientProperties.serviceUrl);
 
         // 注入白名单内容的正则表导师
