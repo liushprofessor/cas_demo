@@ -17,10 +17,10 @@
         var type = getQueryString("type");
         if (type == 1) {
             //这里做了nginx反向代理，换成实际的回调url
-            location.href = "http://localhost/client3/welcome1";
+            location.href = "http://192.168.171.46/client3/welcome1";
         } else if (type == 2) {
             //这里做了nginx反向代理，换成实际的回调url
-            location.href = "http://localhost/client3/welcome2";
+            location.href = "http://192.168.171.46/client3/welcome2";
         } else {
             alert("不存在type参数无法跳转")
         }

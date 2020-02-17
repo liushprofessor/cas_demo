@@ -50,7 +50,7 @@ public class Controller {
     public String toWelcome2(Model model){
 
         model.addAttribute("message","欢迎来到页面2");
-        return "welcome1";
+        return "welcome2";
     }
 
 
