@@ -28,13 +28,27 @@ import org.jasig.cas.client.Protocol;
 public class CasClientConfig {
 
 
-    //客户端部署地址
-    public String serverName;
-    //cas登录地址
-    public String casServerLoginUrl;
+    //CAS服务端地址
+    public String casServiceUrl;
+
+    //应用部署地址
+    public String serviceUrl;
+
+    //CAS 服务路径
+    public String casContextPath="/cas";
+
+    //应用部署路径
+    public String clientContextPath;
+
+    //CAS登录地址
+    public String loginUrl="/login";
+
+    //登出地址
+    public String logoutUrl="/logout";
+
 
     //白名单的正则表达式的值
-    public String ignorePattern;
+    public String whiteUrl="^.*(/logout/?)$";
 
     //白名单鉴权模式，现在只支持正则模式
     public String ignoreUrlPatternType="REGEX";
@@ -47,4 +61,15 @@ public class CasClientConfig {
 
     //代理设置配置参数，代理保存ptg和ptgiou的相对回调地址
     public String proxyReceptorUrl;
+
+    //服务端缓存多出时间单位毫秒
+    public String millisBetweenCleanUps="3600000";
+
+    //如果是代理客户端填写true
+    public Boolean acceptAnyProxy=false;
+
+    //代理回调全路径，用于代理服务端保存pgt和pgtiou
+    public String proxyCallbackUrl;
+
+
 }

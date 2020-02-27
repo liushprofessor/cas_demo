@@ -19,6 +19,7 @@ import org.jasig.cas.client.authentication.RegexUrlPatternMatcherStrategy;
 import org.jasig.cas.client.authentication.UrlPatternMatcherStrategy;
 import org.jasig.cas.client.util.CommonUtils;
 import org.jasig.cas.client.util.ReflectUtils;
+import org.jasig.cas.client.validation.Assertion;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -76,7 +77,7 @@ public class AuthenticationGatewayFilter implements GlobalFilter, Ordered {
         this.ignoreUrlPatternMatcherStrategyClass = (UrlPatternMatcherStrategy)ReflectUtils.newInstance(ignoreUrlPatternClass.getName(), new Object[0]);
         //如果鉴权器不为空
         if (this.ignoreUrlPatternMatcherStrategyClass != null) {
-            this.ignoreUrlPatternMatcherStrategyClass.setPattern(casClientConfig.ignorePattern);
+            this.ignoreUrlPatternMatcherStrategyClass.setPattern(casClientConfig.whiteUrl);
         }
         cookieHolder=ReflectUtils.newInstance(casClientConfig.getCookieHolderPattern(),new Object[0]);
 
@@ -86,7 +87,7 @@ public class AuthenticationGatewayFilter implements GlobalFilter, Ordered {
 
     //将访问的地址编码进行URLEncode后返回
     protected final String constructServiceUrl(ServerHttpRequest request) {
-        return GatewayCommonUtils.constructServiceUrl(request,casClientConfig.serverName, this.protocol.getServiceParameterName(), this.protocol.getArtifactParameterName(), true);
+        return GatewayCommonUtils.constructServiceUrl(request,casClientConfig.serviceUrl, this.protocol.getServiceParameterName(), this.protocol.getArtifactParameterName(), true);
     }
 
 
@@ -119,16 +120,16 @@ public class AuthenticationGatewayFilter implements GlobalFilter, Ordered {
             throw new RuntimeException("不存在登录cookie登录信息");
         } else {
             //从已经登录的容器中获取登录信息
-            Object authVal = cookieHolder.getAttr(authId.toString());
+            Assertion assertion = (Assertion)cookieHolder.getAttr(authId.toString());
             //如果已经存在登录信息应用之前已经登录，直接跳过
-            if (authVal != null) {
+            if (assertion != null) {
                 return chain.filter(exchange);
             } else {
-                //如果本地服务器登录信息已经过期，说明是获取由CAS服务端跳转回来的，重定向至cas服务端验证tgt是否正确
+                //如果没有验证过ticket，说明还未登录过，重定向至cas服务端登录，并且带上登录成功后的回调地址
                 String serviceUrl = this.constructServiceUrl(request);
                 String ticket = retrieveTicketFromRequest(request);
                 if (!StringUtils.isEmpty(ticket)) {
-                    String urlToRedirectTo = GatewayCommonUtils.constructRedirectUrl(casClientConfig.casServerLoginUrl, this.protocol.getServiceParameterName(), serviceUrl);
+                    String urlToRedirectTo = GatewayCommonUtils.constructRedirectUrl(casClientConfig.casServiceUrl+casClientConfig.casContextPath+casClientConfig.loginUrl, this.protocol.getServiceParameterName(), serviceUrl);
                     return GatewayCommonUtils.redirect(exchange, urlToRedirectTo);
                 }
                 throw new RuntimeException("认证过滤器中的ticket为空");

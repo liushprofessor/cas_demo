@@ -25,7 +25,7 @@ public interface CookieHolder {
 
     Object getAttr(String key);
 
-    void setAttr(String key,String attr);
+    void setAttr(String userKey,String key, Object attr);
 
 
 

@@ -25,8 +25,17 @@ import java.util.HashMap;
  */
 public class MapCookieHolder implements CookieHolder {
 
-    private HashMap<String,Object> holder=new HashMap<>();
+    private HashMap<String ,HashMap<String,Object>> holder=new HashMap<>();
 
+    //过期时间
+    private long expireTime;
+
+    public MapCookieHolder(Long expireTime) {
+        if (expireTime!=null){
+            throw new RuntimeException("过期时间不能为空");
+        }
+        this.expireTime = expireTime;
+    }
 
     @Override
     public Object getAttr(String key) {
@@ -34,7 +43,16 @@ public class MapCookieHolder implements CookieHolder {
     }
 
     @Override
-    public void setAttr(String key, String attr) {
-         holder.put(key,attr);
+    public void setAttr(String userKey,String key, Object attr) {
+
+        HashMap<String,Object> userHolder=holder.get(userKey);
+        if(userHolder!=null){
+            userHolder.put(key,attr);
+        }else {
+            userHolder=new HashMap<>();
+            userHolder.put(key,attr);
+        }
+        userHolder.put("expireTime",expireTime);
+
     }
 }
