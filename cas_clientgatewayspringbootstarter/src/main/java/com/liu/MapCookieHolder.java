@@ -13,6 +13,7 @@
 package com.liu;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 功能： TODO(用一句话描述类的功能)
@@ -25,21 +26,28 @@ import java.util.HashMap;
  */
 public class MapCookieHolder implements CookieHolder {
 
-    private HashMap<String ,HashMap<String,Object>> holder=new HashMap<>();
+    private  ConcurrentHashMap<String ,HashMap<String,Object>> holder=new ConcurrentHashMap<>();
 
     //过期时间
     private long expireTime;
 
+
+
+
+
     public MapCookieHolder(Long expireTime) {
-        if (expireTime!=null){
+        if (expireTime==null){
             throw new RuntimeException("过期时间不能为空");
         }
         this.expireTime = expireTime;
     }
 
     @Override
-    public Object getAttr(String key) {
-        return holder.get(key);
+    public Object getAttr(String userKey,String key) {
+        if(holder.get(userKey)==null){
+            return null;
+        }
+        return holder.get(userKey).get(key);
     }
 
     @Override
@@ -51,8 +59,9 @@ public class MapCookieHolder implements CookieHolder {
         }else {
             userHolder=new HashMap<>();
             userHolder.put(key,attr);
+            userHolder.put("expireTime",expireTime);
+            holder.put(userKey,userHolder);
         }
-        userHolder.put("expireTime",expireTime);
 
     }
 }

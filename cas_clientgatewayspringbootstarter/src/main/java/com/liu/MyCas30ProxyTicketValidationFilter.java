@@ -14,6 +14,7 @@ package com.liu;
 
 import org.jasig.cas.client.Protocol;
 import org.jasig.cas.client.util.CommonUtils;
+import org.jasig.cas.client.util.ReflectUtils;
 import org.jasig.cas.client.validation.*;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -50,11 +51,13 @@ public class MyCas30ProxyTicketValidationFilter implements GlobalFilter, Ordered
 
 
 
-    public MyCas30ProxyTicketValidationFilter(CasClientConfig casClientConfig,Class<? extends Cas20ServiceTicketValidator> defaultServiceTicketValidatorClass, Class<? extends Cas20ProxyTicketValidator> defaultProxyTicketValidatorClass) {
+    public MyCas30ProxyTicketValidationFilter(CasClientConfig casClientConfig,CookieHolder cookieHolder) {
+        this.casClientConfig=casClientConfig;
         this.protocol=Protocol.CAS3;
         this.defaultServiceTicketValidator = new Cas30ServiceTicketValidator(casClientConfig.casServiceUrl);
         this.defaultProxyTicketValidator = new Cas30ProxyTicketValidator(casClientConfig.casServiceUrl);
         this.casClientConfig=casClientConfig;
+        this.cookieHolder=cookieHolder;
         ticketValidatorInit();
     }
 
@@ -65,9 +68,9 @@ public class MyCas30ProxyTicketValidationFilter implements GlobalFilter, Ordered
     //初始化ticket验证器
     protected  TicketValidator ticketValidatorInit(){
         if(!casClientConfig.getAcceptAnyProxy()){
-            this.ticketValidator=new Cas30ServiceTicketValidator(casClientConfig.casServiceUrl);
+            this.ticketValidator=new Cas30ServiceTicketValidator(casClientConfig.casServiceUrl+casClientConfig.casContextPath);
         }else {
-            this.ticketValidator=new Cas30ProxyTicketValidator(casClientConfig.casServiceUrl);
+            this.ticketValidator=new Cas30ProxyTicketValidator(casClientConfig.casServiceUrl+casClientConfig.casContextPath);
 
         }
 
@@ -114,7 +117,7 @@ public class MyCas30ProxyTicketValidationFilter implements GlobalFilter, Ordered
 
     //将访问的地址编码进行URLEncode后返回
     protected final String constructServiceUrl(ServerHttpRequest request) {
-        return GatewayCommonUtils.constructServiceUrl(request,casClientConfig.serviceUrl, this.protocol.getServiceParameterName(), this.protocol.getArtifactParameterName(), true);
+        return GatewayCommonUtils.constructServiceUrl(request, this.protocol.getServiceParameterName(), this.protocol.getArtifactParameterName(), true,true);
     }
 
 
@@ -130,6 +133,6 @@ public class MyCas30ProxyTicketValidationFilter implements GlobalFilter, Ordered
 
     @Override
     public int getOrder() {
-        return 0;
+        return -100;
     }
 }

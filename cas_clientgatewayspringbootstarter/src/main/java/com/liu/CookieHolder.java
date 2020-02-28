@@ -23,7 +23,7 @@ package com.liu;
  */
 public interface CookieHolder {
 
-    Object getAttr(String key);
+    Object getAttr(String userKey,String key);
 
     void setAttr(String userKey,String key, Object attr);
 

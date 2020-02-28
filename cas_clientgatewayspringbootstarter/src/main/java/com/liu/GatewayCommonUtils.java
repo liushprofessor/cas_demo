@@ -16,6 +16,7 @@ import org.jasig.cas.client.util.URIBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -24,6 +25,7 @@ import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 功能： TODO(用一句话描述类的功能)
@@ -39,7 +41,7 @@ public class GatewayCommonUtils {
     //从request中 获取参数
     public static String safeGetParameter(ServerHttpRequest request, String parameter) {
         if(request.getQueryParams().get(parameter)!=null){
-            return request.getQueryParams().get(parameter).toString();
+            return request.getQueryParams().getFirst(parameter);
         }
         return null;
     }
@@ -49,9 +51,9 @@ public class GatewayCommonUtils {
 
 
     //将访问的url进行编码后返回
-    public static String constructServiceUrl(ServerHttpRequest request, String serverNames, String serviceParameterName, String artifactParameterName, boolean encode) {
+    public static String constructServiceUrl(ServerHttpRequest request,  String serviceParameterName, String artifactParameterName, boolean encode,boolean ticketValidate) {
 
-            String serverName = findMatchingServerName(request, serverNames);
+            /*String serverName = findMatchingServerName(request, serverNames);
             URIBuilder originalRequestUrl = new URIBuilder(request.getURI().toString(), encode);
 
             originalRequestUrl.setParameters(request.getURI().getQuery());
@@ -110,10 +112,33 @@ public class GatewayCommonUtils {
                 }
             }
 
-            String result = builder.toString();
+            String result = builder.toString();*/
+            //如果是验证ticket拼接url的话
+            if(ticketValidate){
+                String url=request.getURI().toString();
+                if(url.contains("?")){
+                    int index=url.indexOf("?");
+                    String urlWithoutParams=url.substring(0,index+1);
+                    StringBuilder stringBuilder=new StringBuilder(urlWithoutParams);
+                    MultiValueMap<String,String> params=request.getQueryParams();
+                    Set<String> paramsSet=params.keySet();
+                    Iterator<String> paramsIterator=paramsSet.iterator();
+                    while (paramsIterator.hasNext()){
+                        String key=paramsIterator.next();
+                        if(!"ticket".equals(key)){
+                            stringBuilder.append(key).append("=").append(params.getFirst(key)).append("&");
+                        }
 
-            String returnValue = encode ? URLEncoder.encode(result) : result;
-            return returnValue;
+                    }
+                    return stringBuilder.substring(0,stringBuilder.length()-1);
+                }else {
+                    return url;
+                }
+
+            }
+            //如果不是验证ticketurl
+             return encode ? URLEncoder.encode(request.getURI().toString()) : request.getURI().toString();
+
 
     }
 
@@ -165,7 +190,7 @@ public class GatewayCommonUtils {
 
 
     public static String constructRedirectUrl(String casServerLoginUrl, String serviceParameterName, String serviceUrl) {
-        return casServerLoginUrl + (casServerLoginUrl.contains("?") ? "&" : "?") + serviceParameterName + "=" + urlEncode(serviceUrl) ;
+        return casServerLoginUrl + (casServerLoginUrl.contains("?") ? "&" : "?") + serviceParameterName + "=" + serviceUrl ;
     }
 
 

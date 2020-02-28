@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class Controller {
 
 
-    @RequestMapping("test")
+    @RequestMapping("test1")
     @ResponseBody
     public String test(){
 

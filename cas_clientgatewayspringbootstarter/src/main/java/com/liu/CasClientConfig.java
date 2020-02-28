@@ -14,6 +14,7 @@ package com.liu;
 
 import lombok.Data;
 import org.jasig.cas.client.Protocol;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * 功能： TODO(用一句话描述类的功能)
@@ -25,6 +26,7 @@ import org.jasig.cas.client.Protocol;
  * ──────────────────────────────────────────
  */
 @Data
+@ConfigurationProperties(prefix = "cas.liu.client")
 public class CasClientConfig {
 
 
@@ -62,7 +64,7 @@ public class CasClientConfig {
     //代理设置配置参数，代理保存ptg和ptgiou的相对回调地址
     public String proxyReceptorUrl;
 
-    //服务端缓存多出时间单位毫秒
+    //服务端缓存多长时间单位毫秒
     public String millisBetweenCleanUps="3600000";
 
     //如果是代理客户端填写true

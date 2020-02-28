@@ -23,24 +23,29 @@ import org.jasig.cas.client.validation.Assertion;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.session.WebSessionIdResolver;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 功能： TODO(用一句话描述类的功能)
- *
+ * <p>
  * ──────────────────────────────────────────
- *   version  变更日期    修改人    修改说明
+ * version  变更日期    修改人    修改说明
  * ------------------------------------------
- *   V1.0.0   2020/2/20    Liush     初版
+ * V1.0.0   2020/2/20    Liush     初版
  * ──────────────────────────────────────────
  */
 public class AuthenticationGatewayFilter implements GlobalFilter, Ordered {
@@ -68,28 +73,26 @@ public class AuthenticationGatewayFilter implements GlobalFilter, Ordered {
     }
 
 
-    public void init(CasClientConfig casClientConfig){
-
-        this.protocol=Protocol.CAS2;
+    public AuthenticationGatewayFilter(CasClientConfig casClientConfig,CookieHolder cookieHolder) {
+        this.casClientConfig = casClientConfig;
+        this.protocol = Protocol.CAS2;
         //从容器中获取白名单验证器类型,默认正则方式
-        Class ignoreUrlPatternClass=PATTERN_MATCHER_TYPES.get(casClientConfig.getIgnoreUrlPatternType());
+        Class ignoreUrlPatternClass = PATTERN_MATCHER_TYPES.get(casClientConfig.getIgnoreUrlPatternType());
         //用反射新建白名单验证器类
-        this.ignoreUrlPatternMatcherStrategyClass = (UrlPatternMatcherStrategy)ReflectUtils.newInstance(ignoreUrlPatternClass.getName(), new Object[0]);
+        this.ignoreUrlPatternMatcherStrategyClass = (UrlPatternMatcherStrategy) ReflectUtils.newInstance(ignoreUrlPatternClass.getName(), new Object[0]);
         //如果鉴权器不为空
         if (this.ignoreUrlPatternMatcherStrategyClass != null) {
             this.ignoreUrlPatternMatcherStrategyClass.setPattern(casClientConfig.whiteUrl);
         }
-        cookieHolder=ReflectUtils.newInstance(casClientConfig.getCookieHolderPattern(),new Object[0]);
 
+        this.cookieHolder=cookieHolder;
     }
-
 
 
     //将访问的地址编码进行URLEncode后返回
     protected final String constructServiceUrl(ServerHttpRequest request) {
-        return GatewayCommonUtils.constructServiceUrl(request,casClientConfig.serviceUrl, this.protocol.getServiceParameterName(), this.protocol.getArtifactParameterName(), true);
+        return GatewayCommonUtils.constructServiceUrl(request, this.protocol.getServiceParameterName(), this.protocol.getArtifactParameterName(), true,false);
     }
-
 
 
     private boolean isRequestUrlExcluded(ServerHttpRequest request) {
@@ -110,6 +113,7 @@ public class AuthenticationGatewayFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
+        ServerHttpResponse response=exchange.getResponse();
         //如果是白名单跳过拦截器
         if (this.isRequestUrlExcluded(request)) {
             return chain.filter(exchange);
@@ -117,31 +121,28 @@ public class AuthenticationGatewayFilter implements GlobalFilter, Ordered {
         Object authId = request.getCookies().get(casClientConfig.authKey);
         if (authId == null) {
             //在前一个拦截器中已经验证过cookie
-            throw new RuntimeException("不存在登录cookie登录信息");
-        } else {
-            //从已经登录的容器中获取登录信息
-            Assertion assertion = (Assertion)cookieHolder.getAttr(authId.toString());
-            //如果已经存在登录信息应用之前已经登录，直接跳过
-            if (assertion != null) {
-                return chain.filter(exchange);
-            } else {
-                //如果没有验证过ticket，说明还未登录过，重定向至cas服务端登录，并且带上登录成功后的回调地址
-                String serviceUrl = this.constructServiceUrl(request);
-                String ticket = retrieveTicketFromRequest(request);
-                if (!StringUtils.isEmpty(ticket)) {
-                    String urlToRedirectTo = GatewayCommonUtils.constructRedirectUrl(casClientConfig.casServiceUrl+casClientConfig.casContextPath+casClientConfig.loginUrl, this.protocol.getServiceParameterName(), serviceUrl);
-                    return GatewayCommonUtils.redirect(exchange, urlToRedirectTo);
-                }
-                throw new RuntimeException("认证过滤器中的ticket为空");
-            }
+            authId = UUID.randomUUID().toString();
+            response.addCookie(ResponseCookie.from(casClientConfig.authKey,authId.toString()).build());
         }
+        //从已经登录的容器中获取登录信息
+        Assertion assertion = (Assertion) cookieHolder.getAttr(authId.toString(),"_const_cas_assertion_");
+        //如果已经存在登录信息应用之前已经登录，直接跳过
+        if (assertion != null) {
+            return chain.filter(exchange);
+        } else {
+            //如果没有验证过ticket，说明还未登录过，重定向至cas服务端登录，并且带上登录成功后的回调地址
+            String serviceUrl = this.constructServiceUrl(request);
+            String urlToRedirectTo = GatewayCommonUtils.constructRedirectUrl(casClientConfig.casServiceUrl + casClientConfig.casContextPath + casClientConfig.loginUrl, this.protocol.getServiceParameterName(), serviceUrl);
+            return GatewayCommonUtils.redirect(exchange, urlToRedirectTo);
+
+        }
+
 
     }
 
     protected String retrieveTicketFromRequest(ServerHttpRequest request) {
         return GatewayCommonUtils.safeGetParameter(request, this.protocol.getArtifactParameterName());
     }
-
 
 
     @Override
